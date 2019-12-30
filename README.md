@@ -1,6 +1,8 @@
 # inverted_pendulum_simulation_and_control
 Investigating deep learning techniques for controlling a simulated inverted pendulum.
 
+![Final Model Animation](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/pendulum_rectified.gif)
+
 This is an investigation of machine learning for a dynamic control task with a focus on understanding how it works rather than optimizing the performance. The goal is to stabilize a simulated pendulum in an inverted state by applying either a positive or negative torque. 
 
 This task has a number of attractive properties: 
