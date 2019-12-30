@@ -97,7 +97,7 @@ void debug_python() {
 int main()
 {
 	// define variables
-	double theta = 0.0001;
+	double theta = 3.14 / 2;
 	double omega = 0;
 	double alpha = 0;
 	double torque = 0;
@@ -117,7 +117,7 @@ int main()
 	bool use_neural_net = true;
 	bool train = false;
 	int runs = 1;
-	int iterations_per_run = 100;
+	int iterations_per_run = 200;
 	double state_action_state_reward_history[6][5000];
 
 	// begin simulation
@@ -127,7 +127,7 @@ int main()
 	for (int run = 0; run < runs; run++) {
 
 		// begin each run at a random starting angle with no angular velocity
-		theta = (rand() % 100) * 3.14 / 100;
+		// theta = (rand() % 100) * 3.14 / 100;
 		omega = 0;
 
 		// update simulation state for defined number of iterations
@@ -220,6 +220,6 @@ int main()
 
 		std::cout << "done";
 		std::cout << "\n";
-		// debug_python();
+		debug_python();
 	}
 }
