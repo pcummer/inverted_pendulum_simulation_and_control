@@ -26,5 +26,8 @@ We have one more trick here to simplify the learning the process. The obvious st
 ## Rule-based Solution
 A nearly optimal solution can be achieved with only two rules. If 𝜏<sub>0</sub> > 𝑚∗𝑔∗𝑙∗sin⁡𝜃 and 𝜃 ≤ 𝜋/2 then apply the torque counterclockwise (towards 𝜃 = 0). Otherwise, apply the torque along the direction of 𝜔. The first case corresponds to a partially inverted pendulum past the point where the gravitational torque fell below the applied torque so we can directly finish the inversion. The other case corresponds to dumping energy into the system by increasing 𝜔 so that the pendulum will swing up higher and higher until it reaches the first case. 
 
-We implement this in C++ and find that it performs extremely well, both qualitatively and quantitatively. Given a pendulum starting near inversion, 𝜃 ≈ 0, the pendulum will remain within 𝜃 ≤ 0.4. Given a pendulum starting near rest, 𝜃 ≈ 𝜋, inversion will be achieved in the minimum possible number of time steps. That said, there is noticeable overshoot and for sufficiently high mass and low damping that overshoot would cause loss of inversion.  
+We implement this in C++ and find that it performs extremely well, both qualitatively and quantitatively. Given a pendulum starting near inversion, 𝜃 ≈ 0, the pendulum will remain within 𝜃 ≤ 0.4 as shown below (note that theta is not mirrored in the figure). Given a pendulum starting near rest, 𝜃 ≈ 𝜋, inversion will be achieved in the minimum possible number of time steps. That said, there is noticeable overshoot and for sufficiently high mass and low damping that overshoot would cause loss of inversion. 
+
+![Rule-based Evolution](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/rule_start_0_1.png)
+
 
