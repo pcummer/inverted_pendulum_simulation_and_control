@@ -94,6 +94,29 @@ void debug_python() {
 	auto r = cpr::Post(cpr::Url("http://127.0.0.1:5000/debug"), cpr::Multipart{ {"key", "test"} });
 }
 
+double theta_derivative(double omega, double time_step) {
+	return omega * time_step;
+}
+
+double omega_derivative(double theta, double omega, double gravity, double length, double mass, double moment, double applied_torque, double drag, double time_step) {
+	return time_step * (gravity * mass * length * sin(theta) + applied_torque) / moment - drag * omega;
+}
+
+void runge_kutta(double theta, double omega, double gravity, double length, double mass, double moment, double applied_torque, double drag, double time_step, double *theta_address, double *omega_address) {
+	// fourth order runge kutta for coupled differential equations. just a nicer numerical approximation than simply multiplying the derivative by the timestep
+	double k_omega_1 = omega_derivative(theta, omega, gravity, length, mass, moment, applied_torque, drag, time_step);
+	double k_theta_1 = theta_derivative(omega, time_step);
+	double k_omega_2 = omega_derivative(theta + 0.5 * k_theta_1, omega + 0.5 * k_omega_1, gravity, length, mass, moment, applied_torque, drag, time_step);
+	double k_theta_2 = theta_derivative(omega + 0.5 * k_omega_1, time_step);
+	double k_omega_3 = omega_derivative(theta + 0.5 * k_theta_2, omega + 0.5 * k_omega_2, gravity, length, mass, moment, applied_torque, drag, time_step);
+	double k_theta_3 = theta_derivative(omega + 0.5 * k_omega_2, time_step);
+	double k_omega_4 = omega_derivative(theta + 0.5 * k_theta_3, omega + 0.5 * k_omega_3, gravity, length, mass, moment, applied_torque, drag, time_step);
+	double k_theta_4 = theta_derivative(omega + 0.5 * k_omega_3, time_step);
+	*omega_address = omega + (k_omega_1 + 2 * k_omega_2 + 2 * k_omega_3 + k_omega_4) / 6;
+	*theta_address = theta + (k_theta_1 + 2 * k_theta_2 + 2 * k_theta_3 + k_theta_4) / 6;
+}
+
+
 int main()
 {
 	// define variables
@@ -114,7 +137,7 @@ int main()
 
 	// define simulation parameters
 	double time_step = 0.01;
-	bool use_neural_net = true;
+	bool use_neural_net = false;
 	bool train = false;
 	int runs = 1;
 	int iterations_per_run = 200;
@@ -171,11 +194,12 @@ int main()
 			// Advance time for 10 steps between decisions. We expect that the correct action should only change after many time steps so this gives us a 
 			// large performance boost by avoiding the call to the NN every step. It should also encourage divergence between q values for the actions
 			for (int j = 0; j < 10; j++) {
-				torque = gravity * mass * length * sin(theta) + applied_torque;
-				alpha = torque / moment;
+				// torque = gravity * mass * length * sin(theta) + applied_torque;
+				// alpha = torque / moment;
 
-				omega = omega + alpha * time_step - drag * omega;
-				theta = theta + omega * time_step;
+				// omega = omega + alpha * time_step - drag * omega;
+				// theta = theta + omega * time_step;
+				runge_kutta(theta, omega, gravity, length, mass, moment, applied_torque, drag, time_step, &theta, &omega);
 			}
 
 
@@ -220,6 +244,6 @@ int main()
 
 		std::cout << "done";
 		std::cout << "\n";
-		debug_python();
+		// debug_python();
 	}
 }
