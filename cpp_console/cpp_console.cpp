@@ -110,8 +110,8 @@ void runge_kutta(double theta, double omega, double gravity, double length, doub
 	double k_theta_2 = theta_derivative(omega + 0.5 * k_omega_1, time_step);
 	double k_omega_3 = omega_derivative(theta + 0.5 * k_theta_2, omega + 0.5 * k_omega_2, gravity, length, mass, moment, applied_torque, drag, time_step);
 	double k_theta_3 = theta_derivative(omega + 0.5 * k_omega_2, time_step);
-	double k_omega_4 = omega_derivative(theta + 0.5 * k_theta_3, omega + 0.5 * k_omega_3, gravity, length, mass, moment, applied_torque, drag, time_step);
-	double k_theta_4 = theta_derivative(omega + 0.5 * k_omega_3, time_step);
+	double k_omega_4 = omega_derivative(theta + 1.0 * k_theta_3, omega + 1.0 * k_omega_3, gravity, length, mass, moment, applied_torque, drag, time_step);
+	double k_theta_4 = theta_derivative(omega + 1.0 * k_omega_3, time_step);
 	*omega_address = omega + (k_omega_1 + 2 * k_omega_2 + 2 * k_omega_3 + k_omega_4) / 6;
 	*theta_address = theta + (k_theta_1 + 2 * k_theta_2 + 2 * k_theta_3 + k_theta_4) / 6;
 }
