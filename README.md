@@ -1,6 +1,6 @@
 # inverted_pendulum_simulation_and_control
 ## Overview
-An animation of our final deep learning control system:
+An animation of our final neural network controlling the simulated pendulum to achieve inversion:
 ![Final Model Animation](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/pendulum_rectified.gif)
 
 This is an investigation of machine learning for a dynamic control task with a focus on understanding how it works rather than optimizing the performance. The goal is to stabilize a simulated pendulum in an inverted state by applying either a positive or negative torque as decided by a neural network trained via reinforcement learning. 
@@ -14,6 +14,8 @@ This task has a number of attractive properties:
 ## Background
 ### Setup
 Our pendulum is simulated in C++ and controlled via a Tensorflow neural network hosted on a web API in Python. At every time step the state of the pendulum is updated according to its equation of motion under an applied torque in C++. At every tenth time step an http request is made to the neural net, sending the state and recieving a direction for the applied torque, clockwise or counterclockwise. Repeating the action for ten time steps improves computational efficiency, samples a more diverse range of states, and emphasizes the impact of the choice. Ideally it would all sit in C++, but the Tensorflow bindings are painful and the http requests are fast compared to even the forward pass of a moderately sized neural net. 
+
+For precise simulation, we use the 4<sup>th</sup> order Runge-Kutta method for approximating our differential equation. Essentially, we approximate the derivative over the time step as a weighted average of the derivative at the beginning, midpoint, and end of the time step. This method solves 1<sup>st</sup> order differential equations whereas our differential equation is 2<sup>nd</sup> order; however, we can simply express our differential equation as two coupled 1<sup>st</sup> order differential equations and apply Runge-Kutta in parallel to each of them. While we now have more calculations per time step, our local error is 5<sup>th</sup> order in our time step so this is much more efficient than simply shortening the time step for increasing our accuracy. 
 
 ![Setup Diagram](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/Setup%20diagram.PNG)
 
@@ -52,4 +54,5 @@ For an optimal control scheme, the long term reward at each time step is cos⁡(
 This is exactly what see occur in practice: the network learns 𝑄-values that approximately match the theoretical long term rewards across a broad swathe of state space; however, the difference in 𝑄-values for the two actions become vanishingly small as a percent of the average 𝑄-value for a given state. Consequently, the network chooses nearly randomly when controlling the pendulum and 𝜃 remains near 𝜋 for all time. We could of course conduct a hyperparameter search across 𝑑 in search of the perfect value that balances our two concerns given enough patience and compute power, but there's not gaurantee such a value exists. We've also made too many approximations above to be able to calculate an optimal value from theory. Primarily we would need to develop a much better understanding of the approximation error (a profoundly nontrivial exercise).
 
 ### A Solution
-Having realized our error, we return to the convention of a binary reward with 𝑟 = 1 for 𝜃 ≤ 0.4 else 0. The cutoff of 0.4 was picked to be less than sin⁡𝜃 = 𝜏<sub>0</sub> / 𝑚∗𝑔∗𝑙, but is otherwise fairly arbitrary. We continue to train our unsuccessful model from above, rather than reintializing the weights since it has already learned a fair bit of the problem and it helps us overcome the cold start problem for a sparse reward function. We conclude training once we see the model consistently able to invert the pendulum from a near resting start as this is the primary complex behavior we desired. 
+Having realized our error, we return to the convention of a binary reward with 𝑟 = 1 for 𝜃 ≤ 0.4 else 0. The cutoff of 0.4 was picked to be less than sin⁡𝜃 = 𝜏<sub>0</sub> / 𝑚∗𝑔∗𝑙, but is otherwise fairly arbitrary. We continue to train our unsuccessful model from above, rather than reintializing the weights since it has already learned a fair bit of the problem and it helps us overcome the cold start problem for a sparse reward function. We conclude training once we see the model consistently able to invert the pendulum from a near resting start.
+
