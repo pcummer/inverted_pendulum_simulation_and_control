@@ -104,7 +104,7 @@ def debug():
             data = np.asarray([value for value in data.to_dict().values()])
 
     return 'done'
-
+vo
 
 # if this is the main thread of execution first load the model and
 # then start the server
