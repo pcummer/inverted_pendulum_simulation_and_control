@@ -1,7 +1,6 @@
 # inverted_pendulum_simulation_and_control
 ## Overview
 An animation of our final neural network controlling the simulated pendulum to achieve inversion:
-Figure 1: Animation of Final Control System
 ![Final Model Animation](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/pendulum_rectified.gif)
 
 This is an investigation of machine learning for a dynamic control task with a focus on understanding how it works rather than optimizing the performance. The goal is to stabilize a simulated pendulum in an inverted state by applying either a positive or negative torque as decided by a neural network trained via reinforcement learning. 
@@ -18,7 +17,6 @@ Our pendulum is simulated in C++ and controlled via a Tensorflow neural network 
 
 For precise simulation, we use the 4<sup>th</sup> order Runge-Kutta method for approximating our differential equation. Essentially, we approximate the derivative over the time step as a weighted average of the derivative at the beginning, midpoint, and end of the time step. This method solves 1<sup>st</sup> order differential equations whereas our differential equation is 2<sup>nd</sup> order; however, we can simply express our differential equation as two coupled 1<sup>st</sup> order differential equations and apply Runge-Kutta in parallel to each of them. While we now have more calculations per time step, our local error is 5<sup>th</sup> order in our time step so this is much more efficient than simply shortening the time step for increasing our accuracy. 
 
-Figure 2: Setup Diagram
 ![Setup Diagram](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/Setup%20diagram.PNG)
 
 For interesting physics, we require that our physical parameters fall within certain ranges. The applied torque must be less than a critical value, 𝜏<sub>0</sub> = 𝑚∗𝑔∗𝑙, so that control system cannot lift the pendulum from rest to inversion against gravity; instead, under this constraint it must pump energy into the system to achieve inversion. We'd also benefit from small damping proportial to 𝜔, the angular velocity, to avoid our simulation breaking down under sufficiently high 𝜔, though we of course need to allow the system to accumulate sufficient kinetic energy. Roughly this mean we want 𝜏<sub>damping</sub> < 𝜏<sub>0</sub> when the kinetic energy is equal to the potential energy at inversion, 𝑚∗𝑔∗2𝑙=1/2 𝑚∗(𝜔∗𝑙)<sup>2</sup>. 
@@ -32,7 +30,6 @@ A nearly optimal solution can be achieved with only two rules. If 𝜏<sub>0</su
 
 We implement this in C++ and find that it performs extremely well, both qualitatively and quantitatively. Given a pendulum starting near inversion, 𝜃 ≈ 0, the pendulum will remain within 𝜃 ≤ 0.4 as shown below (note that theta is not mirrored for clarity in the figure). Given a pendulum starting near rest, 𝜃 ≈ 𝜋, inversion will be achieved in the minimum possible number of time steps. That said, there is noticeable overshoot and for sufficiently high mass and low damping that overshoot would cause loss of inversion. 
 
-Figure 4: Rule-based Controls Theta Evolution
 ![Rule-based Evolution](https://github.com/pcummer/inverted_pendulum_simulation_and_control/blob/master/rule_start_0_1.png)
 
 ## Reinforcement Learning
